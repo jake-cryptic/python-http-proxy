@@ -6,4 +6,4 @@ services:
       dockerfile: Dockerfile
     image: jake-cryptic/python-http-proxy
     ports:
-      - "8080:32000"
+      - "32000:8080"
