@@ -1,4 +1,6 @@
 from bottle import route, run, request
+from urllib3 import disable_warnings
+from urllib3.exceptions import InsecureRequestWarning
 from urllib.parse import unquote, urlparse
 from requests import Session
 from requests.adapters import HTTPAdapter
@@ -9,6 +11,7 @@ from socket import getaddrinfo
 s = Session()
 s.mount('http://', HTTPAdapter(max_retries=1))
 s.mount('https://', HTTPAdapter(max_retries=1))
+disable_warnings(InsecureRequestWarning)
 
 
 def uri_validator(x):
@@ -28,7 +31,6 @@ def uri_validator(x):
 def make_req(url):
     auth = None
     if request.auth is not None:
-        print(f'Added HTTP auth: {request.auth}')
         auth = HTTPBasicAuth(request.auth[0], request.auth[1])
 
     return s.request(
@@ -47,12 +49,12 @@ def proxy(url):
         print(f'Not getting URL: {safe_url}')
         return f'Failed request, {safe_url} is not valid or contactable'
     else:
-        print(f'Request {request.method} to {safe_url}')
+        print(f'-> {request.method}\t{safe_url}')
 
     try:
         resp = make_req(safe_url)
     except:
-        return f'Failed request {request.method} to {safe_url}'
+        return f'\tFailed {request.method}\t {safe_url}'
 
     return resp.text
 
